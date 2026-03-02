@@ -1,0 +1,961 @@
+🔹 STEP 3 — Inicializar Node
+
+En la terminal integrada de VS Code:
+
+npm init -y
+
+✔ Esto crea package.json
+
+NO ejecutamos nada todavía.
+
+🔹 STEP 4 — Instalar dependencias
+
+Como vamos a usar:
+
+Express
+
+MySQL
+
+MongoDB
+
+Multer
+
+XLSX
+
+dotenv
+
+cors
+
+nodemon
+
+Instala:
+
+npm install express mysql2 mongoose multer xlsx dotenv cors
+npm install nodemon --save-dev
+
+Todavía NO ejecutamos nada.
+
+🔹 STEP 5 — Configurar scripts
+
+Abre package.json.
+
+Modifica solo esta parte:
+
+"scripts": {
+  "start": "node index.js",
+  "dev": "nodemon index.js"
+}
+
+Guarda.
+
+🟢 PARTE 2 — Crear estructura antes de ejecutar
+
+Este es el paso que antes faltó orden.
+
+🔹 STEP 6 — Crear archivo principal
+
+En la raíz crea:
+
+index.js
+
+Ahora sí escribe dentro:
+
+const express = require("express");
+const app = express();
+
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("SaludPlus API running");
+});
+
+const PORT = 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+Guarda el archivo.
+
+🟢 PARTE 3 — Ahora sí ejecutamos
+🔹 STEP 7 — Ejecutar servidor
+
+En terminal:
+
+npm run dev
+
+Ahora debería aparecer:
+
+Server running on port 3000
+
+Y NO debe salir.
+
+🔹 STEP 8 — Probar en navegador
+
+Ve a:
+
+http://localhost:3000
+
+Debe decir:
+
+SaludPlus API running
+
+Si ves eso:
+
+✔ Proyecto base funcionando
+✔ Node correcto
+✔ Express correcto
+✔ Nodemon correcto
+
+🧠 REGLA IMPORTANTE PARA LA PRUEBA
+
+El orden mental siempre es:
+
+Crear carpeta
+
+npm init
+
+Instalar dependencias
+
+Crear archivo principal
+
+Escribir código base
+
+Ejecutar
+
+Nunca ejecutes antes de tener app.listen().
+
+🟢 PARTE 4 — Configurar MySQL correctamente
+
+Ahora vamos a:
+
+Crear base de datos
+
+Crear tablas (3FN)
+
+Conectar Node con MySQL
+
+Probar conexión
+
+🔹 STEP 1 — Verificar que MySQL esté funcionando
+
+En tu Mac, ejecuta:
+
+mysql -u root -p
+
+Si te pide contraseña, ingrésala.
+
+Si entra y ves algo como:
+
+mysql>
+
+✔ MySQL está funcionando.
+
+Si no funciona, dime qué error aparece.
+
+🔹 STEP 2 — Crear base de datos
+
+Dentro de MySQL:
+
+CREATE DATABASE saludplus;
+USE saludplus;
+
+Verifica:
+
+SHOW DATABASES;
+
+Debe aparecer saludplus.
+
+🔹 STEP 3 — Crear tablas (versión correcta MySQL)
+
+Ejecuta esto:
+
+CREATE TABLE patients (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(20),
+    address TEXT
+);
+
+CREATE TABLE doctors (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    specialty VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE insurances (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    coverage_percentage DECIMAL(5,2) NOT NULL
+);
+
+CREATE TABLE appointments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    appointment_id VARCHAR(50) NOT NULL UNIQUE,
+    appointment_date DATE NOT NULL,
+    patient_id INT,
+    doctor_id INT,
+    insurance_id INT NULL,
+    treatment_code VARCHAR(50),
+    treatment_description TEXT,
+    treatment_cost DECIMAL(10,2),
+    amount_paid DECIMAL(10,2),
+
+    FOREIGN KEY (patient_id) REFERENCES patients(id),
+    FOREIGN KEY (doctor_id) REFERENCES doctors(id),
+    FOREIGN KEY (insurance_id) REFERENCES insurances(id)
+);
+
+Ahora verifica:
+
+SHOW TABLES;
+
+Debe mostrar las 4 tablas.
+
+🟢 PARTE 5 — Conectar Node con MySQL
+🔹 STEP 4 — Crear archivo .env
+
+En la raíz del proyecto crea:
+
+.env
+
+Contenido:
+
+PORT=3000
+
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=tu_password
+DB_NAME=saludplus
+
+⚠️ Cambia tu_password por la real.
+
+🔹 STEP 5 — Crear conexión MySQL
+
+Crea carpeta:
+
+config
+
+Dentro crea:
+
+mysql.js
+
+Contenido:
+
+const mysql = require("mysql2/promise");
+require("dotenv").config();
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10
+});
+
+module.exports = pool;
+🟢 PARTE 6 — Probar conexión
+
+Ahora vamos a probar que Node se conecta a MySQL.
+
+Abre index.js y agrega esto arriba del app.listen:
+
+const pool = require("./config/mysql");
+
+async function testConnection() {
+  try {
+    const connection = await pool.getConnection();
+    console.log("MySQL connected successfully");
+    connection.release();
+  } catch (error) {
+    console.error("MySQL connection error:", error.message);
+  }
+}
+
+testConnection();
+
+Guarda.
+
+🔹 STEP 6 — Ejecutar
+npm run dev
+
+Debes ver:
+
+MySQL connected successfully
+Server running on port 3000
+🎯 Si eso funciona
+
+Significa:
+
+✔ Base creada
+✔ Tablas creadas
+✔ Conexión funcionando
+✔ Proyecto bien estructurado
+
+🟢 PARTE 7 — Configurar MongoDB correctamente
+
+Vamos a:
+
+Verificar que Mongo esté instalado
+
+Crear base de datos
+
+Conectar Node
+
+Crear modelo patientHistory
+
+Probar conexión
+
+Todo paso a paso.
+
+🔹 STEP 1 — Verificar MongoDB
+
+En tu Mac ejecuta:
+
+mongosh
+
+Si ves algo como:
+
+Current Mongosh Log ID ...
+>
+
+✔ Mongo está funcionando.
+
+Si dice “command not found”, dime y lo resolvemos.
+
+🔹 STEP 2 — Crear base de datos
+
+Dentro de mongosh:
+
+use saludplus
+
+Mongo crea la base automáticamente cuando guardes el primer documento.
+
+Puedes verificar con:
+
+show dbs
+
+(Si aún no aparece, es normal, porque está vacía.)
+
+Escribe:
+
+exit
+🔹 STEP 3 — Configurar conexión en Node
+
+Ya tienes en .env algo así:
+
+MONGO_URI=mongodb://localhost:27017/saludplus
+
+Si no está, agrégalo.
+
+Crear carpeta config (si no existe)
+
+Dentro crea:
+
+mongo.js
+
+Contenido:
+
+const mongoose = require("mongoose");
+require("dotenv").config();
+
+async function connectMongo() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB connected successfully");
+  } catch (error) {
+    console.error("MongoDB connection error:", error.message);
+  }
+}
+
+module.exports = connectMongo;
+🔹 STEP 4 — Conectar Mongo en index.js
+
+En index.js, arriba agrega:
+
+const connectMongo = require("./config/mongo");
+
+Y antes de app.listen, agrega:
+
+connectMongo();
+
+Tu index.js ahora debería verse así (resumido):
+
+const express = require("express");
+const pool = require("./config/mysql");
+const connectMongo = require("./config/mongo");
+
+const app = express();
+app.use(express.json());
+
+connectMongo();
+
+async function testConnection() {
+  try {
+    const connection = await pool.getConnection();
+    console.log("MySQL connected successfully");
+    connection.release();
+  } catch (error) {
+    console.error("MySQL connection error:", error.message);
+  }
+}
+
+testConnection();
+
+app.get("/", (req, res) => {
+  res.send("SaludPlus API running");
+});
+
+const PORT = 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+Guarda.
+
+🔹 STEP 5 — Ejecutar
+
+En terminal:
+
+npm run dev
+
+Debes ver:
+
+MongoDB connected successfully
+MySQL connected successfully
+Server running on port 3000
+🎯 Si eso funciona
+
+Significa que ya tienes:
+
+✔ Arquitectura híbrida real
+✔ Dos motores conectados
+✔ Proyecto estable
+
+En este punto ya tienes una arquitectura híbrida real funcionando:
+
+✅ Express corriendo
+
+✅ MySQL conectado
+
+✅ MongoDB conectado
+
+✅ Proyecto ordenado
+
+Ahora empieza lo importante de verdad: diseño documental y consistencia entre motores.
+
+🟢 PARTE 8 — Crear el Modelo en MongoDB
+
+Vamos a crear la colección:
+
+patient_histories
+
+Con un documento por paciente.
+
+🔹 STEP 1 — Crear carpeta models (si no existe)
+
+Dentro crea:
+
+patientHistory.model.js
+🔹 STEP 2 — Crear el esquema correctamente
+
+Contenido del archivo:
+
+const mongoose = require("mongoose");
+
+const appointmentSchema = new mongoose.Schema({
+  appointmentId: String,
+  date: String,
+  doctorName: String,
+  specialty: String,
+  treatmentDescription: String,
+  amountPaid: Number
+});
+
+const patientHistorySchema = new mongoose.Schema({
+  patientEmail: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  patientName: String,
+  appointments: [appointmentSchema]
+});
+
+module.exports = mongoose.model("PatientHistory", patientHistorySchema);
+
+Guarda.
+
+🟢 PARTE 9 — Probar que el modelo funciona
+
+Vamos a probar insertando un documento manualmente.
+
+🔹 STEP 3 — Crear prueba temporal en index.js
+
+Debajo de connectMongo(); agrega:
+
+const PatientHistory = require("./models/patientHistory.model");
+
+async function testMongoInsert() {
+  try {
+    const testPatient = await PatientHistory.create({
+      patientEmail: "test@mail.com",
+      patientName: "Test User",
+      appointments: [
+        {
+          appointmentId: "APT-001",
+          date: "2024-01-10",
+          doctorName: "Dr. Example",
+          specialty: "Cardiology",
+          treatmentDescription: "General Checkup",
+          amountPaid: 50000
+        }
+      ]
+    });
+
+    console.log("Test document inserted in MongoDB");
+  } catch (error) {
+    console.log("Mongo insert test:", error.message);
+  }
+}
+
+testMongoInsert();
+
+Guarda.
+
+🔹 STEP 4 — Ejecutar
+npm run dev
+
+Si todo está bien verás:
+
+Test document inserted in MongoDB
+
+Si lo ejecutas otra vez debería decir algo como:
+
+duplicate key error
+
+Eso es bueno. Significa que unique: true está funcionando.
+
+🔹 STEP 5 — Verificar en Mongo
+
+En terminal:
+
+mongosh
+
+Luego:
+
+use saludplus
+db.patienthistories.find().pretty()
+
+⚠️ Nota: Mongo convierte el modelo PatientHistory en colección:
+
+patienthistories
+
+(en minúscula y plural)
+
+🎯 Si ves el documento
+
+Significa que:
+
+✔ MongoDB está funcionando
+✔ El esquema está correcto
+✔ La colección está bien diseñada
+✔ El concepto de documento embebido está funcionando
+
+🧠 Concepto clave (para el examen)
+
+Aquí estás aplicando:
+
+SQL → relaciones normales y consistencia
+
+Mongo → datos desnormalizados para lectura rápida
+
+En MySQL tienes:
+
+appointments
+JOIN doctors
+JOIN patients
+
+En Mongo tienes:
+
+1 documento = historial completo
+
+Eso es exactamente la justificación híbrida.
+
+🔥 SIGUIENTE PASO
+
+Ahora viene la parte importante del proyecto:
+
+👉 Construir el script de migración idempotente desde Excel
+👉 Insertar en MySQL sin duplicar
+👉 Actualizar Mongo con upsert
+
+🟢 PARTE 3 — Migración Idempotente con Multer
+🎯 OBJETIVO DE ESTA PARTE
+
+Crear un endpoint que:
+
+1️⃣ Reciba el Excel (CSV)
+2️⃣ Inserte datos únicos en MySQL
+3️⃣ Actualice Mongo con upsert
+4️⃣ Sea idempotente (no duplica si se ejecuta varias veces)
+
+🟣 STEP 1 — Instalar dependencias necesarias
+
+Si no las tienes aún:
+
+npm install multer csv-parser xlsx
+
+Explicación:
+
+multer → subir archivo
+
+xlsx → leer Excel
+
+csv-parser → leer CSV (por si lo exportas como CSV)
+
+🟣 STEP 2 — Crear carpeta uploads
+
+En tu proyecto:
+
+/uploads
+🟣 STEP 3 — Crear configuración de Multer
+
+Crea archivo:
+
+config/multer.js
+
+Contenido:
+
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+module.exports = upload;
+
+✔ Esto guarda el archivo en /uploads
+
+🟣 STEP 4 — Crear ruta de migración
+
+En:
+
+routes/migrationRoutes.js
+const express = require("express");
+const upload = require("../config/multer");
+const { migrateData } = require("../controllers/migrationController");
+
+const router = express.Router();
+
+router.post("/migrate", upload.single("file"), migrateData);
+
+module.exports = router;
+🟣 STEP 5 — Crear controlador de migración
+
+En:
+
+controllers/migrationController.js
+
+Vamos a usar:
+
+csv-parser
+🟢 STEP 1 — Verifica que tengas instalado
+npm install csv-parser
+🟢 STEP 2 — Actualizar migrationController.js
+
+Reemplaza lo que hicimos con xlsx por esto:
+
+const fs = require("fs");
+const csv = require("csv-parser");
+
+exports.migrateData = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const results = [];
+
+    fs.createReadStream(req.file.path)
+      .pipe(csv())
+      .on("data", (data) => results.push(data))
+      .on("end", () => {
+        console.log("Filas leídas:", results.length);
+
+        res.json({
+          message: "CSV leído correctamente",
+          rows: results.length,
+        });
+      });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error leyendo CSV" });
+  }
+};
+
+chequear en postman
+Perfecto 👌 vamos súper claro y paso a paso SOLO con Postman.
+
+🟢 PASO 1 — Asegúrate que el servidor esté corriendo
+
+En la terminal:
+
+npm run dev
+
+Debe decir algo como:
+
+Server running on port 3000
+Mongo connected
+MySQL connected
+🟢 PASO 2 — Configurar Postman
+1️⃣ Método
+
+Selecciona:
+
+POST
+2️⃣ URL
+
+Escribe:
+
+http://localhost:3000/api/migrate
+3️⃣ Ir a la pestaña "Body"
+
+Haz clic en:
+
+Body
+
+Luego selecciona:
+
+form-data
+4️⃣ Agregar el archivo
+
+En la tabla que aparece:
+
+KEY	VALUE	TYPE
+
+En la columna KEY escribe exactamente:
+
+file
+
+⚠️ Debe llamarse "file" porque en tu ruta pusimos:
+
+upload.single("file")
+
+Luego en la misma fila:
+
+En la columna derecha cambia de:
+
+Text
+
+a
+
+File
+
+(Es un pequeño selector desplegable).
+
+Luego en VALUE selecciona tu archivo .csv.
+
+🟢 PASO 3 — Enviar
+
+Presiona:
+
+Send
+🎯 Resultado esperado
+
+Debe responder algo como:
+
+{
+  "message": "CSV leído correctamente",
+  "rows": 100
+}
+
+Y en tu consola debe aparecer:
+
+Filas leídas: 100
+
+🔎 ¿Por qué no se modificó nada en la base de datos?
+
+Porque hasta ahora tu código solo hace esto:
+
+fs.createReadStream(...)
+   .pipe(csv())
+   .on("data", ...)
+   .on("end", ...)
+
+👉 Solo está leyendo el archivo y contando filas
+👉 NO está guardando nada en MySQL
+👉 NO está guardando nada en MongoDB
+
+Por eso:
+
+✔ Postman responde bien
+✔ No hay errores
+❌ No se inserta nada
+
+Y eso es normal 👍
+
+🧠 Ahora viene la parte real de la prueba
+
+La prueba seguramente pide algo como:
+
+Leer CSV
+
+Insertar datos en MySQL
+
+Migrarlos a MongoDB
+
+O hacer alguna transformación
+
+🔥 Siguiente paso
+
+Ahora necesitamos modificar esto:
+
+.on("end", () => {
+
+Para que en vez de solo contar filas:
+
+👉 Inserte los datos en MySQL
+
+Para que el Punto 3 quede oficialmente listo y funcional en tu proyecto, debes actualizar el contenido de tu archivo migrationController.js. Lo que tienes ahora (según el snippet de tus archivos) solo lee el CSV y cuenta las filas, pero no guarda nada en las bases de datos.
+
+Aquí tienes el código completo y final para ese archivo, diseñado para manejar tus 4 archivos y cumplir con la idempotencia:
+
+Actualiza tu controllers/migrationController.js
+JavaScript
+const fs = require("fs");
+const csv = require("csv-parser");
+const pool = require("../config/mysql");
+const PatientHistory = require("../models/patientHistory.model");
+
+exports.migrateData = async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No se subió ningún archivo" });
+
+  const results = [];
+
+  // 1. Leer el archivo usando el stream de FS y CSV-Parser
+  fs.createReadStream(req.file.path)
+    .pipe(csv())
+    .on("data", (data) => results.push(data))
+    .on("end", async () => {
+      try {
+        if (results.length === 0) return res.status(400).json({ error: "El archivo está vacío" });
+
+        const headers = Object.keys(results[0]);
+
+        // 2. Lógica de Inserción según el tipo de archivo
+        for (const row of results) {
+          
+          // CASO: SEGUROS (Insurances)
+          if (headers.includes('coverage_percentage')) {
+            await pool.execute(
+              "INSERT IGNORE INTO insurances (id, name, coverage_percentage) VALUES (?, ?, ?)",
+              [row.id, row.name, row.coverage_percentage]
+            );
+          } 
+          
+          // CASO: MÉDICOS (Doctors)
+          else if (headers.includes('Specialty')) {
+            await pool.execute(
+              "INSERT IGNORE INTO doctors (id, name, email, specialty) VALUES (?, ?, ?, ?)",
+              [row.id, row.name, row.email, row.Specialty]
+            );
+          }
+
+          // CASO: PACIENTES (Patients)
+          else if (headers.includes('address')) {
+            await pool.execute(
+              "INSERT IGNORE INTO patients (id, name, email, phone, address) VALUES (?, ?, ?, ?, ?)",
+              [row.id, row.name, row.email, row.phone, row.address]
+            );
+          }
+
+          // CASO: CITAS (Appointments + MongoDB Sync)
+          else if (headers.includes('appointment_id')) {
+            // A. Insertar en MySQL (Idempotente con INSERT IGNORE)
+            await pool.execute(
+              `INSERT IGNORE INTO appointments 
+              (id, appointment_id, appointment_date, patient_id, doctor_id, insurance_id, treatment_code, treatment_description, treatment_cost, amount_paid) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              [row.id, row.appointment_id, row.appointment_date, row.patient_id, row.doctor_id, row.insurance_id, row.treatment_code, row.treatment_description, row.treatment_cost, row.amount_paid]
+            );
+
+            // B. Crear/Actualizar en MongoDB (Punto 2 y 3 del trabajo)
+            // Buscamos los nombres en SQL para que el documento de Mongo esté completo
+            const [[patient]] = await pool.execute("SELECT name, email FROM patients WHERE id = ?", [row.patient_id]);
+            const [[doctor]] = await pool.execute("SELECT name, specialty FROM doctors WHERE id = ?", [row.doctor_id]);
+
+            if (patient && doctor) {
+              await PatientHistory.findOneAndUpdate(
+                { patientEmail: patient.email },
+                { 
+                  $set: { patientName: patient.name },
+                  $addToSet: { // $addToSet evita duplicar la cita dentro del array
+                    appointments: {
+                      appointmentId: row.appointment_id,
+                      date: row.appointment_date,
+                      doctorName: doctor.name,
+                      specialty: doctor.specialty,
+                      treatmentDescription: row.treatment_description,
+                      amountPaid: Number(row.amount_paid)
+                    }
+                  }
+                },
+                { upsert: true } // Si no existe el paciente, lo crea
+              );
+            }
+          }
+        }
+
+        res.json({ message: "Migración exitosa e idempotente", filas: results.length });
+
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error procesando datos" });
+      } finally {
+        // Borrar el archivo de la carpeta /uploads después de procesarlo
+        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      }
+    });
+};
+¿Por qué esto cumple con el Punto 3?
+Uso de Multer: Ya lo tienes configurado en migrationRoutes.js para recibir el archivo.
+
+Inserción en MySQL: Usa INSERT IGNORE, lo que significa que si el ID ya existe, MySQL ignora la fila en lugar de dar error (cumple con la idempotencia).
+
+Sincronización MongoDB: Usa findOneAndUpdate con upsert: true. Si el paciente no existe en Mongo, lo crea; si existe, solo le añade la cita al array de appointments.
+
+$addToSet: Esta es la clave de la idempotencia en MongoDB. Si intentas subir la misma cita dos veces, $addToSet se da cuenta de que los datos son idénticos y no agrega un duplicado al array.
+
+¿Cómo lo ejecutas?
+Ahora que el código está listo, debes abrir un programa como Postman o Insomnia y hacer lo siguiente:
+
+Hacer un POST a http://localhost:3000/api/migration/migrate.
+
+En el cuerpo (Body), selecciona form-data.
+
+Agrega una clave llamada file y selecciona uno de tus archivos CSV.
+
+Importante: Debes subirlos en el orden que te dije: Seguros -> Médicos -> Pacientes -> Citas.
+
+.env:
+PORT=3000
+
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=Julian1412%
+DB_NAME=saludplus
+
+MONGO_URI=mongodb://localhost:27017/saludplus
