@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoMarket Pro</title>
+  <!-- Enlace al archivo CSS externo -->
+  <link rel="stylesheet" href="styles.css">
+  <script src="./app.js" type="module"></script>
+</head>
+<body>
+
+<header>🚗 AutoMarket Pro</header>
+
+<main>
+
+  <!-- SECCIÓN 1: Formulario para registrar vehículo -->
+  <div class="card">
+    <h2>➕ Registrar nuevo vehículo</h2>
+    <div id="form-alert" class="alert"></div>
+    <form id="car-form">
+      <div class="form-grid">
+        <label>Placa *<input type="text" id="plate" placeholder="Ej: ABC123" required></label>
+        <label>Marca *<input type="text" id="brand" placeholder="Ej: Toyota" required></label>
+        <label>Color *<input type="text" id="color" placeholder="Ej: Rojo" required></label>
+        <label>Kilometraje<input type="text" id="kilometers" placeholder="Ej: 15000"></label>
+        <label>Estado del vehículo
+          <select id="car_state">
+            <option value="used">Usado</option>
+            <option value="new">Nuevo</option>
+          </select>
+        </label>
+        <label>Estado operacional
+          <select id="operational_status">
+            <option value="available">Disponible</option>
+            <option value="sold">Vendido</option>
+          </select>
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary">Guardar vehículo</button>
+    </form>
+  </div>
+
+  <!-- SECCIÓN 2: Tabla de inventario -->
+  <div class="card">
+    <h2>📋 Inventario de vehículos</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Placa</th><th>Marca</th><th>Color</th>
+          <th>Km</th><th>Estado</th><th>Operacional</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="cars-table-body"></tbody>
+    </table>
+  </div>
+
+  <!-- SECCIÓN 3: Importar CSV -->
+  <div class="card">
+    <h2>📂 Importar vehículos desde CSV</h2>
+    <div id="csv-alert" class="alert"></div>
+    <div class="csv-zone">
+      <p>Selecciona tu archivo CSV con los datos de vehículos</p>
+      <input type="file" id="csv-file" accept=".csv">
+    </div>
+    <button class="btn btn-success" onclick="importCSV()">⬆️ Importar CSV</button>
+  </div>
+
+</main>
+
+<!-- Modal de edición -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2>✏️ Editar vehículo</h2>
+    <input type="hidden" id="edit-id">
+    <div class="form-grid">
+      <label>Marca<input type="text" id="edit-brand"></label>
+      <label>Color<input type="text" id="edit-color"></label>
+      <label>Kilometraje<input type="text" id="edit-kilometers"></label>
+      <label>Estado del vehículo
+        <select id="edit-car_state">
+          <option value="used">Usado</option>
+          <option value="new">Nuevo</option>
+        </select>
+      </label>
+      <label>Estado operacional
+        <select id="edit-operational_status">
+          <option value="available">Disponible</option>
+          <option value="sold">Vendido</option>
+        </select>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-warning">Cancelar</button>
+<button class="btn btn-primary">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
