@@ -1,0 +1,34 @@
+Operadores de Comparación
+$gt (Greater Than): Selecciona documentos donde el valor del campo es mayor que el valor especificado.
+$lt (Less Than): Selecciona documentos donde el valor del campo es menor que el valor especificado.
+$eq (Equal): Selecciona documentos donde el valor del campo es exactamente igual al valor especificado. Aunque find({campo: valor}) es lo mismo, $eq se usa para dar mayor claridad o en validaciones complejas.
+$in (In): Selecciona documentos donde el valor del campo coincide con cualquier valor dentro de un arreglo (lista) que tú proporciones. 
+
+Operadores Lógicos
+$and: Une varias condiciones y solo devuelve los documentos que cumplen todas las condiciones al mismo tiempo.
+$or: Une varias condiciones y devuelve los documentos que cumplen al menos una de ellas. 
+
+Operador de Evaluación
+$regex: Permite realizar búsquedas mediante expresiones regulares, lo que sirve para encontrar patrones de texto (por ejemplo, palabras que empiecen con "A" o que contengan una secuencia específica).
+
+Pipeline agregaciones
+1. $match (El Filtro) 
+Funciona igual que un WHERE en SQL o el filtro básico de un find(). 
+Qué hace: Selecciona solo los documentos que cumplen con una condición específica para que pasen a la siguiente etapa.
+Uso común: Reducir la cantidad de datos al principio del proceso para que sea más rápido. 
+2. $group (El Agregador)
+Es el equivalente al GROUP BY de SQL. 
+Qué hace: Junta varios documentos que comparten un mismo campo (como una "categoría") en uno solo.
+Uso común: Hacer cálculos como sumas ($sum), promedios ($avg) o contar elementos. 
+3. $sort (El Ordenador)
+Equivale al ORDER BY de SQL. 
+Qué hace: Ordena los documentos resultantes según el campo que elijas.
+Valores: 1 para orden ascendente (A-Z, 0-9) y -1 para descendente (Z-A, 9-0). 
+4. $project (El Modelador)
+Es similar al SELECT de SQL. 
+Qué hace: Decide qué campos se muestran y cuáles se ocultan en el resultado final.
+Uso común: Renombrar campos, crear campos nuevos calculados o simplemente limpiar la salida para que solo tenga lo necesario. 
+5. $unwind (El Desconstructor)
+Esta etapa es única para manejar arreglos (arrays). 
+Qué hace: Si un documento tiene un arreglo con 3 elementos, $unwind lo divide en 3 documentos independientes, cada uno con un elemento del arreglo.
+Uso común: Se usa antes de un $group cuando necesitas analizar o sumar datos que están guardados dentro de listas. 
