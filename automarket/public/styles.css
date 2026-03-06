@@ -39,10 +39,10 @@ main { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
   padding: 10px 20px; border: none; border-radius: 6px;
   cursor: pointer; font-size: 14px; font-weight: bold;
 }
-.btn-primary { background: #1a6374; color: white; }
-.btn-success { background: #28a745; color: white; }
-.btn-danger  { background: #dc3545; color: white; }
-.btn-warning { background: #ffc107; color: #333;  }
+.btn-primary { background: #177489; color: white; }
+.btn-success { background: #19c541; color: white; }
+.btn-danger  { background: #dc0e23; color: white; }
+.btn-warning { background: #084570; color: #ffffff;  }
 .btn:hover   { opacity: 0.85; }
 
 /* ── Tabla de inventario ──────────────────────────────────────────── */

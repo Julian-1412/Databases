@@ -1,0 +1,26 @@
+    1.	Middleware en ExpressUn middleware es una función que se ejecuta entre la llegada de la petición (request) y el envío de la respuesta (response) en un servidor Express. Recibe tres parámetros:  req ,  res  y  next . Puede: leer/modificar la petición, cortar el flujo devolviendo una respuesta, o llamar a  next()  para que continúe la cadena. El flujo típico es: Request → middlewares globales (ej. express.json) → middlewares de ruta (ej. autenticación) → handler final de la ruta → Response .
+	2.	Protocolo multipart/form-dataCuando un formulario solo envía texto, se suele usar  application/json  o  application/x-www-form-urlencoded . Para enviar archivos (imágenes, CSV, PDFs) se usa  multipart/form-data . En este formato el cuerpo de la petición se divide en “partes” separadas por un  boundary . Cada parte tiene cabeceras propias ( Content-Disposition ,  Content-Type ) y luego su contenido (que puede ser binario). Una parte típica de archivo se ve así:
+	•	 Content-Disposition: form-data; name="file"; filename="autos.csv" 
+	•	 Content-Type: text/csv 
+	•	contenido del archivo.Gracias a esto el navegador puede mezclar campos de texto y archivos en la misma petición, y en el backend se pueden procesar ambos tipos de datos.
+	3.	Multer y sus mecanismos internosMulter es un middleware para Express diseñado para procesar peticiones  multipart/form-data  y exponer los archivos en  req.file  o  req.files . Internamente ofrece dos estrategias principales de almacenamiento:
+    a.  diskStorage 
+	•	Guarda el archivo subido directamente en el sistema de archivos del servidor.
+	•	Se configura con dos funciones:
+	•	 destination(req, file, cb) : define la carpeta donde se guarda.
+	•	 filename(req, file, cb) : define el nombre con el que se guarda el archivo.
+	•	El archivo queda accesible por ruta ( req.file.path ).
+	•	Es apropiado cuando quieres conservar físicamente el archivo (por ejemplo, imágenes de perfil o documentos).
+	b.  memoryStorage 
+	•	Guarda el archivo en memoria RAM como un  Buffer , disponible en  req.file.buffer .
+	•	No se escribe nada en disco; los datos viven solo durante el ciclo de la petición.
+	•	Es ideal cuando necesitas procesar el contenido inmediatamente (por ejemplo, leer un CSV y volcar sus filas a la base de datos, o subirlo a un servicio externo como S3).
+	•	No es recomendable para archivos muy grandes porque puede consumir mucha memoria.
+	4.	Diferencias clave entre diskStorage y memoryStorage
+	•	Ubicación:  diskStorage  escribe en disco;  memoryStorage  mantiene el archivo en RAM.
+	•	Uso típico:
+	•	 diskStorage : almacenar archivos tal cual (subida de imágenes/documentos).
+	•	 memoryStorage : procesar y descartar (parsear CSV, transformar imágenes, enviar a otro servicio).
+	•	Riesgos:
+	•	 diskStorage : necesitas gestionar limpieza de archivos temporales y permisos de escritura.
+	•	 memoryStorage : riesgo de agotar RAM si se permiten archivos grandes o muchos uploads simultáneos.
